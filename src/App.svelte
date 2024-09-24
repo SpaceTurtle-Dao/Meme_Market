@@ -1,12 +1,13 @@
 <script lang="ts">
-  import { Router, Route } from "svelte-routing";
+  import { onMount } from "svelte";
+  import Router from "svelte-spa-router";
+  import { link } from "svelte-spa-router";
   import "./app.css";
   import Navbar from "$lib/components/Navbar.svelte";
-  import ProfileView from "$lib/components/views/profile/ProfileView.svelte";
   import UserProfile from "$lib/components/views/profile/UserProfile.svelte";
-  import CreatePostModal from "$lib/components/CreateMeme.svelte";
+  import CreatePostModal from "$lib/components/CreatePost.svelte";
   import Feed from "$lib/components/Feed.svelte";
-  import Explore from "$lib/components/views/explore/Explore.svelte";
+  import ProfileCreation from "$lib/components/views/profile/CreateProfile.svelte";
   import {
     Home as HomeIcon,
     Search,
@@ -14,55 +15,103 @@
     User,
     MoreHorizontal,
     Plus,
-    Zap // New icon for Relay
+    Zap,
+    Edit,
   } from "lucide-svelte";
-  import Feedpage from "$lib/components/Feedpage.svelte";
-  import RepliesPage from "$lib/components/RepliesPage.svelte";
-  import ProfileNip from "$lib/components/views/profile/ProfileNip.svelte";
-  import { currentUser } from "./stores/profile.store";
+  import Profile from "$lib/components/views/profile/Profile.svelte";
+  import {
+    currentUser,
+    userRelay,
+    isConnected,
+    user,
+  } from "./lib/stores/profile.store";
   import {
     Avatar,
     AvatarFallback,
     AvatarImage,
   } from "$lib/components/ui/avatar";
   import LowerProfile from "$lib/components/views/profile/LowerProfile.svelte";
-  import RelayButtons from '$lib/components/Relay.svelte';
-
-  export let url = "";
+  import RelayButtons from "$lib/components/Relay.svelte";
+  import CreateProfile from "$lib/components/views/profile/CreateProfile.svelte";
+  import ConnectWalletButton from "$lib/components/wallet.svelte";
+  import Button from "$lib/components/ui/button/button.svelte";
+  import { info, relay } from "$lib/ao/relay";
 
   let isCreatePostModalOpen = false;
-  let profile: any;
+  let _isConnected = false;
+  let _relay: string = "";
+
+  userRelay.subscribe((value) => {
+    console.log("got relay");
+    console.log(value);
+    _relay = value;
+  });
+  isConnected.subscribe((value) => {
+    _isConnected = value;
+  });
+
   function toUrl(tx: string) {
     return (
       "https://7emz5ndufz7rlmskejnhfx3znpjy32uw73jm46tujftmrg5mdmca.arweave.net/" +
       tx
     );
   }
-  currentUser.subscribe((value) => {
-    profile = value;
+
+  async function checkWalletConnection() {
+    // @ts-ignore
+    if (window.arweaveWallet) {
+      try {
+        // @ts-ignore
+        const address = await window.arweaveWallet.getActiveAddress();
+        if (address) {
+          console.log(address);
+          console.log(_isConnected);
+          _isConnected = true;
+          let _userRelay = await relay(address);
+          if (_userRelay) {
+            userRelay.set(_userRelay);
+            let _currentUser = await info(_relay)
+            currentUser.set(_currentUser)
+            user.set(_currentUser)
+          }
+        }
+      } catch (error) {
+        console.log(_isConnected);
+        console.error("Failed to get active address:", error);
+      }
+    }
+  }
+
+  onMount(async () => {
+    await checkWalletConnection();
   });
+
   const menuItems = [
     { icon: HomeIcon, label: "Home", href: "/feed" },
-    { icon: Search, label: "Explore", href: "/explore" },
     { icon: User, label: "Profile", href: "/profile" },
-    { icon: Zap, label: "Relay", href: "/relay" }
+    { icon: Zap, label: "Relay", href: "/relay" },
   ];
 
   function toggleCreatePostModal() {
     isCreatePostModalOpen = !isCreatePostModalOpen;
   }
 
-  //@ts-ignore
-  async function handlePostSubmit(event) {
+  async function handlePostSubmit(event: CustomEvent) {
     console.log("New post submitted:", event.detail.content);
+  }
+
+  const routes = {
+    '/feed': Feed,
+    '/profile': Profile,
+    '/': Feed,
+    '/UserProfile': UserProfile,
+    '/relay': RelayButtons,
   }
 </script>
 
-<Router {url}>
-  <div class="flex h-screen overflow-hidden">
-    <aside
-      class="w-64 bg-background-500 shadow-lg flex flex-col justify-between p-4"
-    >
+<div class="bg-background h-screen">
+  <div class="flex justify-center w-full bg-background">
+    <div class="flex flex-col space-y-10 p-4">
       <div class="space-y-4 pt-16">
         <nav>
           <ul class="space-y-2">
@@ -70,15 +119,14 @@
               <li>
                 <a
                   href={item.href}
+                  use:link
                   class="flex items-center p-2 px-2 rounded-full hover:bg-background-700 transition-colors duration-200"
                 >
                   <svelte:component
                     this={item.icon}
-                    class="w-6 h-6 mr-4 text-primary-50"
+                    class="w-6 h-6 mr-4 text-primary"
                   />
-                  <span class="text-lg font-medium text-white"
-                    >{item.label}</span
-                  >
+                  <span class="text-lg font-medium text-primary">{item.label}</span>
                 </a>
               </li>
             {/each}
@@ -87,44 +135,41 @@
                 on:click={toggleCreatePostModal}
                 class="flex items-center p-2 px-5 rounded-full hover:bg-background-700 transition-colors duration-200"
               >
-                <MoreHorizontal class="w-6 h-6 mr-4 text-white" />
-                <span class="text-lg font-medium text-white">More</span>
+                <MoreHorizontal class="w-6 h-6 mr-4 text-primary" />
+                <span class="text-lg font-medium text-primary">More</span>
               </button>
             </li>
           </ul>
         </nav>
-        <button
-          on:click={toggleCreatePostModal}
-          class="w-full bg-background-700 text-white rounded-full py-3 font-bold text-lg hover:bg-primary-50 transition-colors duration-200 flex items-center justify-center"
-        >
-          <Plus class="w-5 h-5 mr-2" />
-          Post
-        </button>
+        {#if !_isConnected}
+          <ConnectWalletButton />
+        {:else if _relay == null || _relay == undefined}
+          <CreateProfile />
+        {:else}
+          <Button
+            on:click={toggleCreatePostModal}
+            class="w-44 h-12 bg-primary text-secondary rounded-full py-3 font-bold text-lg hover:bg-ring transition-colors duration-200 flex items-center justify-center"
+          >
+            <Plus class="w-5 h-5 mr-2" />
+            Post
+          </Button>
+        {/if}
       </div>
-      <div class="p-4">
-        <LowerProfile />
-      </div>
-    </aside>
+      {#if _relay}
+        <div class="p-4">
+          <LowerProfile />
+        </div>
+      {/if}
+    </div>
 
-    <main class="flex-1 overflow-y-auto bg-background-500">
-      <Navbar />
-      <div class="container mx-auto px-4 pt-16">
-        <Route path="/feed" component={Feed} />
-        <Route path="/profile" component={ProfileNip} />
-        <Route path="/" component={Feed} />
-        <Route path="/explore" component={Explore} />
-        <Route path="/UserProfile" component={UserProfile} />
-        <Route path="/Feed" component={Feedpage} />
-        <Route path="/Feed/:id" let:params>
-          <RepliesPage memeId={params.id} />
-        </Route>
-        <Route path="/relay" component={RelayButtons} />
-      </div>
-    </main>
+    <div class="w-1/3">
+      <Router {routes} />
+    </div>
   </div>
-</Router>
+</div>
 
 <CreatePostModal
+  relay={_relay}
   isOpen={isCreatePostModalOpen}
   on:close={toggleCreatePostModal}
   on:submit={handlePostSubmit}

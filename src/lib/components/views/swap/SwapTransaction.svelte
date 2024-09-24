@@ -3,7 +3,7 @@
   import { formatDistanceToNow } from "date-fns";
   import { ArrowUpRight, ArrowDownRight } from "lucide-svelte";
   // import { fetchSwaps } from "$lib/ao/relay";
-  import { swapsStore } from "../../../../stores/pool.store";
+  import { swapsStore } from "../../../stores/pool.store";
   import type { Swap } from "$lib/models/Swap";
   import { DECIMALS, formatNumber } from "$lib/constants";
   import type { Meme } from "$lib/models/Meme";

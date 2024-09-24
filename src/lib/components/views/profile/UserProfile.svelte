@@ -18,7 +18,7 @@
   import { Camera } from "lucide-svelte";
   // import { profile } from "$lib/ao/relay";
   import { upload } from "$lib/ao/uploader";
-  import { eventStore } from "../../../../stores/events.store";
+  import { eventStore } from "../../../stores/events.store";
 
   let username = "";
   let displayName = "";

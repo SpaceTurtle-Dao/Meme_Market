@@ -22,9 +22,9 @@ function formatDate(dateString: string): string {
   <h1>Events</h1>
   {#each events as event (event.id)}
     <div class="event-item">
-      <h2>{getActionFromTags(event.tags)}</h2>
+      <!--<h2>{getActionFromTags(event.tags)}</h2>-->
       <p>{event.content}</p>
-      <small>Created at: {formatDate(event.created_at)} by {event.pubkey}</small>
+      <small>Created at: {formatDate(event.created_at.toString())} by {event.pubkey}</small>
     </div>
   {/each}
 </div>

@@ -1,7 +1,7 @@
 import { fontFamily } from "tailwindcss/defaultTheme";
 import type { Config } from "tailwindcss";
 
-const pallet = {
+/*const pallet = {
   "amarnath": {
     50: "#FCE8EE",
     100: "#FAD1DC",
@@ -93,61 +93,72 @@ const pallet = {
     900: "#151719",
     950: "#0C0D0E"
   }
-};
+};*/
+
+
 
 const config: Config = {
   darkMode: ["class"],
-  content: [
+	content: [
     "./components/**/*.{js,ts,jsx,tsx}",
     "./app/**/*.{js,ts,jsx,tsx}",
     "./src/**/*.{html,js,svelte,ts}"
   ],
-  safelist: ["dark"],
-  theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px"
-      }
-    },
-    extend: {
-      fontFamily: {
-        heading: ['var(--font-heading)', 'Encode Sans', ...fontFamily.sans],
-        body: ['var(--font-body)', 'Overpass', ...fontFamily.sans],
-        display: ['Overpass', 'ui-sans-serif']
-      },
-      colors: {
-        primary: pallet.primary,
-        secondary: pallet.cadet,
-        background: pallet.backg,
-        foreground: pallet.onyx,
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-      },
-      borderRadius: {
-        xl: `calc(var(--radius) + 4px)`,
-        lg: `var(--radius)`,
-        md: `calc(var(--radius) - 2px)`,
-        sm: `calc(var(--radius) - 4px)`
-      },
-      keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" }
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" }
-        }
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out"
-      },
-    },
-  },
+	safelist: ["dark"],
+	theme: {
+		container: {
+			center: true,
+			padding: "2rem",
+			screens: {
+				"2xl": "1400px",
+			},
+		},
+		extend: {
+			colors: {
+				border: "hsl(var(--border) / 100%)",
+				input: "hsl(var(--input) / 100%)",
+				ring: "hsl(var(--ring))",
+				background: "hsl(var(--background) / 100%)",
+				foreground: "hsl(var(--foreground) / 100%)",
+				primary: {
+					DEFAULT: "hsl(var(--primary) / 100%)",
+					foreground: "hsl(var(--primary-foreground) / 100%)",
+				},
+				secondary: {
+					DEFAULT: "hsl(var(--secondary) / 100%)",
+					foreground: "hsl(var(--secondary-foreground) / 100%)",
+				},
+				destructive: {
+					DEFAULT: "hsl(var(--destructive) / 100%)",
+					foreground: "hsl(var(--destructive-foreground) / 100%)",
+				},
+				muted: {
+					DEFAULT: "hsl(var(--muted) / 100%)",
+					foreground: "hsl(var(--muted-foreground) / 100%)",
+				},
+				accent: {
+					DEFAULT: "hsl(var(--accent) / 100%)",
+					foreground: "hsl(var(--accent-foreground) / 100%)",
+				},
+				popover: {
+					DEFAULT: "hsl(var(--popover) / 100%)",
+					foreground: "hsl(var(--popover-foreground) / 100%)",
+				},
+				card: {
+					DEFAULT: "hsl(var(--card) / 100%)",
+					foreground: "hsl(var(--card-foreground) / 100%)",
+				},
+			},
+			borderRadius: {
+				lg: "var(--radius)",
+				md: "calc(var(--radius) - 2px)",
+				sm: "calc(var(--radius) - 4px)",
+			},
+			fontFamily: {
+				sans: ["geist-sans", ...fontFamily.sans],
+			},
+		},
+	},
   plugins: [require("tailwindcss-animate")],
 };
 

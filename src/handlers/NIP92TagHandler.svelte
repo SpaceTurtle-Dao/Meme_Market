@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import type { Event } from "../stores/events.store";
+  import type { Event } from "../lib/stores/events.store";
 
   export let event: Event;
 

@@ -13,8 +13,8 @@
   } from "lucide-svelte";
   import UserProfile from "./views/profile/UserProfile.svelte";
   import Feed from "$lib/Feed.svelte";
-  import { currentUser } from "../../stores/profile.store";
-  import type { Profile } from "$lib/models/Profile";
+  import { currentUser } from "$lib/stores/profile.store";
+  import { profileFromEvent, type Profile } from "$lib/models/Profile";
   import {
     Avatar,
     AvatarFallback,
@@ -40,7 +40,7 @@
   }
 
   currentUser.subscribe((value) => {
-    profile = value;
+    profile = profileFromEvent(value.Profile);
   });
 </script>
 
@@ -105,15 +105,17 @@
       <div class="p-4">
         <div class="bg-gradient-to-r from-secondary-500 to-pink-500 p-6">
           <div class="flex items-center space-x-4">
-            <Avatar class="h-24 w-24 ring-4 ring-white">
-              <AvatarImage src={toUrl(profile.Image)} alt={profile.Name} />
-              <AvatarFallback>{profile.Name}</AvatarFallback>
-            </Avatar>
+            {#if profile.picture}
+              <Avatar class="h-24 w-24 ring-4 ring-white">
+                <AvatarImage src={toUrl(profile.picture)} alt={profile.name} />
+                <AvatarFallback>{profile.name}</AvatarFallback>
+              </Avatar>
+            {/if}
             <div>
               <h1 class="text-3xl font-extrabold text-white">
-                {profile.Name}
+                {profile.name}
               </h1>
-              <p class="text-secondary-200">@{profile.Name}</p>
+              <p class="text-secondary-200">@{profile.name}</p>
               <p class="mt-2 text-white">{"profile.bio"}</p>
             </div>
           </div>

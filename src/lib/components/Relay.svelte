@@ -1,8 +1,8 @@
 <script lang="ts">
     import { info, relay, relays, spawnRelay } from "$lib/ao/relay";
     import type { string } from "zod";
-    import { userRelay } from "../../stores/profile.store";
-    import { walletAddress } from '../../stores/walletStore';
+    import { userRelay } from "../stores/profile.store";
+    import { walletAddress } from '../stores/walletStore';
     import { Zap, Cpu, Copy } from 'lucide-svelte';
     import { INDEXER_ID } from "$lib/constants";
 

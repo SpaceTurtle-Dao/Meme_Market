@@ -1,20 +1,27 @@
 // event.ts
 import { writable } from 'svelte/store';
-
-export type EventsStoresData = Array<{ 
+export interface Event {
   id: string;
   pubkey: string;
-  created_at: string;
+  created_at: number;
   kind: number;
-  tags:[string[]];
+  tags: Array<Array<string>>;
   content: string;
-}>
+}
+
+export interface EventRequest {
+  kind: number;
+  tags: Array<Array<string>>;
+  content: string;
+}
+
+export type EventsStoresData = Array<Event>
 
 const mockData: EventsStoresData = [
   {
     id: '1',
     pubkey: 'user1',
-    created_at: '2023-09-13T12:00:00Z',
+    created_at: 1726767860000,
     kind: 1,
     tags: [['Action', 'EVENT']],
     content: 'New event created: Conference on Svelte Development'
@@ -22,7 +29,7 @@ const mockData: EventsStoresData = [
   {
     id: '2',
     pubkey: 'user2',
-    created_at: '2023-09-13T12:05:00Z',
+    created_at: 1726767860000,
     kind: 1,
     tags: [['Action', 'CLOSE']],
     content: 'Event closed: Workshop on Reactive Programming'
@@ -30,7 +37,7 @@ const mockData: EventsStoresData = [
   {
     id: '3',
     pubkey: 'user3',
-    created_at: '2023-09-13T12:10:00Z',
+    created_at: 1726767860000,
     kind: 1,
     tags: [['Action', 'Cost']],
     content: 'Cost updated: $50 for early bird tickets'
@@ -38,7 +45,7 @@ const mockData: EventsStoresData = [
   {
     id: '4',
     pubkey: 'user4',
-    created_at: '2023-09-13T12:15:00Z',
+    created_at: 1726767860000,
     kind: 1,
     tags: [['Action', 'Token']],
     content: 'New token created: SVLT'
@@ -46,7 +53,7 @@ const mockData: EventsStoresData = [
   {
     id: '5',
     pubkey: 'user5',
-    created_at: '2023-09-13T12:20:00Z',
+    created_at: 1726767860000,
     kind: 1,
     tags: [['Action', 'Profile']],
     content: 'Profile updated: John Doe, Senior Svelte Developer'
@@ -54,7 +61,7 @@ const mockData: EventsStoresData = [
   {
     id: '6',
     pubkey: 'user6',
-    created_at: '2023-09-13T12:25:00Z',
+    created_at: 1726767860000,
     kind: 1,
     tags: [['Action', 'Feed']],
     content: 'New feed item: Latest Svelte tips and tricks'
@@ -62,7 +69,7 @@ const mockData: EventsStoresData = [
   {
     id: '7',
     pubkey: 'user7',
-    created_at: '2023-09-13T12:30:00Z',
+    created_at: 1726767860000,
     kind: 1,
     tags: [['Action', 'FetchFeed']],
     content: 'Fetching feed: Svelte community updates'
@@ -70,7 +77,7 @@ const mockData: EventsStoresData = [
   {
     id: '8',
     pubkey: 'user8',
-    created_at: '2023-09-13T12:35:00Z',
+    created_at: 1726767860000,
     kind: 1,
     tags: [['Action', 'Info']],
     content: 'Info update: New Svelte version 4.0 released'
@@ -78,7 +85,7 @@ const mockData: EventsStoresData = [
   {
     id: '9',
     pubkey: 'user9',
-    created_at: '2023-09-13T12:40:00Z',
+    created_at: 1726767860000,
     kind: 1,
     tags: [['Action', 'Withdraw']],
     content: 'Withdrawal processed: 100 SVLT tokens'
@@ -86,7 +93,7 @@ const mockData: EventsStoresData = [
   {
     id: '10',
     pubkey: 'user10',
-    created_at: '2023-09-13T12:45:00Z',
+    created_at: 1726767860000,
     kind: 1,
     tags: [['Action', 'Credit-Notice']],
     content: 'Credit notice: 50 SVLT tokens added to your account'

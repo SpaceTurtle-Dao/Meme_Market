@@ -18,22 +18,25 @@
 		return _tags;
 	};
 
-	export const UnSubscribe = (
-		relay: string
-	) => {
+	export const UnSubscribe = (relay: string) => {
 		let _tags = [
 			{ name: "Action", value: "UnSubscribe" },
-			{ name: "Relay", value: relay }
+			{ name: "Relay", value: relay },
 		];
 		return _tags;
 	};
 
-	export const SetOwner = (
-		owner: string
-	) => {
+	export const SetOwner = (owner: string) => {
 		let _tags = [
 			{ name: "Action", value: "SetOwner" },
-			{ name: "_Owner", value: owner }
+			{ name: "_Owner", value: owner },
+		];
+		return _tags;
+	};
+
+	export const GetOwner = () => {
+		let _tags = [
+			{ name: "Action", value: "GetOwner" },
 		];
 		return _tags;
 	};
@@ -50,6 +53,14 @@
 
 	export const Subscriptions = () => {
 		let _tags = [{ name: "Action", value: "Subscriptions" }];
+		return _tags;
+	};
+
+	export const IsSubscribed = (relay: string) => {
+		let _tags = [
+			{ name: "Action", value: "IsSubscribed" },
+			{ name: "Relay", value: relay },
+		];
 		return _tags;
 	};
 
@@ -73,13 +84,20 @@
 		return _tags;
 	};
 
-	export const Relay = (owner:string) => {
-		let _tags = [{ name: "Action", value: "Relay" },{ name: "_Owner", value: owner }];
+	export const Relay = (owner: string) => {
+		let _tags = [
+			{ name: "Action", value: "Relay" },
+			{ name: "_Owner", value: owner },
+		];
 		return _tags;
 	};
 
-	export const Relays = (page:string,size:string) => {
-		let _tags = [{ name: "Action", value: "Relays" },{ name: "Page", value: page },{ name: "Size", value: size}];
+	export const Relays = (page: string, size: string) => {
+		let _tags = [
+			{ name: "Action", value: "Relays" },
+			{ name: "Page", value: page },
+			{ name: "Size", value: size },
+		];
 		return _tags;
 	};
 </script>

@@ -3,7 +3,7 @@ import mime from 'mime';
 // @ts-ignore
 export const upload = async (file) => {
   let mimeType = mime.getType(file.name);
-  let ext = mime.getExtension(mimeType);
+  let ext = mime.getExtension(mimeType!);
   let data = await file.arrayBuffer()
   // #1 Get the data from the POST request; encoded as base64 string.
   //const b64string = req.body.b64string
@@ -25,7 +25,7 @@ export const upload = async (file) => {
   let transaction = await arweave.createTransaction({ data: data });
   // let video_transaction = await arweave.createTransaction({data: file});
   // video_transaction.addTag("Content-Type", "video/mp4");
-  transaction.addTag('Content-Type', mimeType);
+  transaction.addTag('Content-Type', mimeType!);
   await arweave.transactions.sign(transaction);
   const response = await arweave.transactions.post(transaction);
   const status = await arweave.transactions.getStatus(transaction.id);
@@ -35,7 +35,9 @@ export const upload = async (file) => {
   );
   console.log(url);
   return {
+    url:url,
     hash:transaction.id,
-    ext: ext
+    ext: ext,
+    mimeType: mimeType
   };
 };
