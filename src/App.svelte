@@ -16,6 +16,8 @@
   import MessagesPage from "$lib/components/Messages/MessagesPage.svelte";
   import MobileTopView from "$lib/components/views/main/MobileTopView.svelte";
   import MobileBottomNavBar from "$lib/components/views/main/MobileBottomNavBar.svelte";
+  import PublicProfile from "$lib/components/views/profile/PublicProfile.svelte";
+  import Search from "$lib/components/Search/Search.svelte";
 
   let isLoading = true;
   let isFollowListAlreadyFetched = false;
@@ -24,21 +26,21 @@
   const routes = {
     "/": LandingPage,
     "/feed": Feed,
+    "/search": Search,
     "/profile": Profile,
     "/messages": MessagesPage,
     "/profile/:address": Profile,
+    "/public/profile/:address": PublicProfile,
     "/post/:id/:user": IndividualPost,
     "/signup": SignUp,
     "/test": MobileTopView,
   };
 
-  // Store the current route in sessionStorage when it changes
   $: if ($location) {
     sessionStorage.setItem("lastRoute", $location);
   }
 
   onMount(async () => {
-    // Check if there's a stored route
     const storedRoute = sessionStorage.getItem("lastRoute");
     if (storedRoute) {
       initialRoute = storedRoute;
@@ -50,7 +52,6 @@
       if ($addressStore.address) {
         await currentUser.fetch();
         if ($currentUser) {
-          // Only restore the route if user is authenticated
           if (storedRoute && storedRoute !== "/") {
             push(storedRoute);
           }
@@ -87,6 +88,18 @@
         Connecting to wallet...
       </p>
     </div>
+  </div>
+{:else if $location.startsWith('/public/profile/')}
+  <div class="bg-background">
+    <MobileTopView />
+    <div class="flex w-full bg-background justify-center">
+      <Left />
+      <Middle>
+        <Router {routes} />
+      </Middle>
+      <Right />
+    </div>
+    <MobileBottomNavBar />
   </div>
 {:else if !$currentUser && $location !== "/signup"}
   <LandingPage />

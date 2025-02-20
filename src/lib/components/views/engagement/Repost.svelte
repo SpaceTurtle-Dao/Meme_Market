@@ -5,8 +5,9 @@
   import { onMount } from "svelte";
   import { fetchEvents, event } from "$lib/ao/relay";
   import { currentUser } from "$lib/stores/current-user.store";
+  import type { Post } from "$lib/models/Post";
 
-  export let _event: any;
+  export let post: Post;
 
   let reposted = false;
   let reposts: Array<any> = [];
@@ -18,7 +19,7 @@
   };
 
   async function repost() {
-    if (!_event) return;
+    if (!post) return;
 
     let _tags: Array<Tag> = [
       {
@@ -34,11 +35,11 @@
       },
       {
         name: "e",
-        value: _event.Id.toString(),
+        value: post.id.toString(),
       },
       {
         name: "marker",
-        value: "root",
+        value: "repost",
       },
     ];
 
@@ -52,7 +53,7 @@
   }
 
   async function fetchReposts() {
-    if (!_event) return
+    if (!_event) return;
     let filters: Array<any> = [];
     reposts = [];
     let filter1 = {

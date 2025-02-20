@@ -5,8 +5,9 @@
     import { onMount } from "svelte";
     import { fetchEvents, event } from "$lib/ao/relay";
     import { currentUser } from "$lib/stores/current-user.store";
+    import type { Post } from "$lib/models/Post";
 
-    export let _event: any;
+    export let post: Post;
 
     let liked = false;
     let likes: Array<any> = [];
@@ -36,11 +37,11 @@
         _tags.push(pubkeyTag);
         liked = !liked;
         await event(_tags);
-        await fetchLikes()
+        await fetchLikes();
     }
 
     async function fetchLikes() {
-        if (!_event) return
+        if (!_event) return;
         let filters: Array<any> = [];
         likes = [];
         let filter1 = {
@@ -55,12 +56,12 @@
                 //p: [_event.From]
             },
         };
-        filters.push(filter1,filter2);
+        filters.push(filter1, filter2);
         let _filters = JSON.stringify(filters);
         likes = await fetchEvents(_filters);
-        for(var i=0; i < likes.length; i++){
-            if(likes[i].From == $currentUser.address){
-                liked = true
+        for (var i = 0; i < likes.length; i++) {
+            if (likes[i].From == $currentUser.address) {
+                liked = true;
             }
         }
         filters = [];
@@ -69,7 +70,7 @@
     onMount(async () => {
         //console.log($currentUser.address)
         //console.log("getting likes for id");
-        await fetchLikes()
+        await fetchLikes();
         /*console.log("got "+likes.length+" likes for id");
         console.log(_event.Id)
         console.log(likes);*/
@@ -86,7 +87,10 @@
         <Heart strokeWidth={0} class="fill-red-400" />
         <p class="font-thin text-red-400">{likes.length}</p>
     {:else}
-        <Heart strokeWidth={0.8} class="text-primary hover:fill-red-400 hover:text-red-400" />
+        <Heart
+            strokeWidth={0.8}
+            class="text-primary hover:fill-red-400 hover:text-red-400"
+        />
         <p class="font-thin">{likes.length}</p>
     {/if}
 </Button>

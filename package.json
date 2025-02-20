@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@permaweb/aoconnect": "^0.0.59",
+    "@permaweb/aoprofile": "^0.0.9",
     "@sveltejs/kit": "^2.16.1",
     "ao-tokens": "^0.0.4",
     "arweave": "^1.15.1",

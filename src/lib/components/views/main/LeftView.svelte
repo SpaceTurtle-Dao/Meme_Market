@@ -3,15 +3,16 @@
   import CreatePostModal from "$lib/components/posts/CreatePost.svelte";
   import LowerProfile from "$lib/components/views/profile/LowerProfile.svelte";
   import Logo from "../../../../assets/Logo2.png";
-  import { Home as HomeIcon, User, MoreHorizontal, Mail } from "lucide-svelte";
+  import { Home as HomeIcon, User, MoreHorizontal, Mail, Search } from "lucide-svelte";
   import { currentUser } from "$lib/stores/current-user.store";
   import { isMobile } from "$lib/stores/is-mobile.store";
 
   const menuItems = [
-    { icon: HomeIcon, label: "Home", href: "/feed" },
-    { icon: User, label: "Profile", href: `/profile/${$currentUser.address}` },
-    { icon: Mail, label: "Messages", href: "/messages" },
-  ];
+  { icon: HomeIcon, label: "Home", href: "/feed" },
+  { icon: Search, label: "Search", href: "/search" },
+  { icon: User, label: "Profile", href: `/profile/${$currentUser?.address}` },
+  { icon: Mail, label: "Messages", href: "/messages" },
+];
 
   // width 259 plus widthpadding 8
 </script>

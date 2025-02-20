@@ -7,7 +7,7 @@
   } from "$lib/components/ui/avatar";
   import { Button } from "$lib/components/ui/button";
   import { currentUser } from "$lib/stores/current-user.store";
-  import Post from "../../posts/Post.svelte";
+  import PostComponent from "../../posts/Post.svelte";
   import * as Tabs from "$lib/components/ui/tabs/index.js";
   import { Link, CalendarDays } from "lucide-svelte";
   import { onMount } from "svelte";
@@ -21,13 +21,15 @@
   import Skeleton from "$lib/components/ui/skeleton/skeleton.svelte";
   import type { Profile } from "$lib/models/Profile";
   import { profileService } from "$lib/services/ProfileService";
+    import { postService } from "$lib/services/PostService";
+    import type { Post } from "$lib/models/Post";
 
   export let params: { address?: string } = {};
   
   let profile: Profile;
 
   let activeTab: string = "posts";
-  let events: Array<Event> = [];
+  let posts: Array<Post> = [];
 
   let showModal = false;
   let textWithUrl = "";
@@ -37,7 +39,7 @@
 
 
   async function fetchMedia() {
-    console.log("will get media")
+    /*console.log("will get media")
     let filters: Array<any> = [];
     let mimeTypes: string[] = [
       "image/apng",
@@ -75,49 +77,10 @@
         };
         filters.push(filter);
       }*/
-
-      let filter2 = {
-          tags: {
-            mimeType: "image/jpeg",
-          },
-        };
-        filters.push(filter2);
-
-      let _filters = JSON.stringify(filters);
-      console.log("Will send fetch event")
-      console.log("/////////Tags////////////")
-      console.log(_filters)
-      events = await fetchEvents(_filters);
-    }
-    filters = [];
   }
 
   async function fetchPost() {
-    let filters: Array<any> = [];
-    //events = [];
-    if (profile) {
-      let filter = {
-        kinds: ["1", "6"],
-        since: 1663905355000,
-        until: Date.now(),
-        limit: 100,
-        tags: {
-          marker: ["root"],
-        },
-      };
-      let filter2 = {
-        tags: {
-          From: [profile.address],
-        },
-      };
-      filters.push(filter);
-      filters.push(filter2);
-      let _filters = JSON.stringify(filters);
-      if (profile) {
-        events = await fetchEvents(_filters);
-      }
-    }
-    filters = [];
+    posts = (await postService.fetchPost(0,1000,[profile.address])).values().toArray()
   }
 
   async function fetchSubs() {
@@ -173,6 +136,7 @@
     }
 
     if (profile) {
+      console.log("getting post")
       await fetchPost();
       // Split the string into parts, keeping the URLs separate
       const parts = textWithUrl.split(urlPattern);
@@ -329,18 +293,18 @@
       </Tabs.List>
       <Tabs.Content value="post">
         <div class="">
-          {#each events as event}
+          {#each posts as post}
             <div class="border border-border max-w-prose">
-              <Post {event} />
+              <PostComponent {post} />
             </div>
           {/each}
         </div>
       </Tabs.Content>
       <Tabs.Content value="media">
         <div class="">
-          {#each events as event}
+          {#each posts as post}
             <div class="border border-border max-w-prose">
-              <Post {event} />
+              <PostComponent {post} />
             </div>
           {/each}
         </div>

@@ -17,21 +17,15 @@
   import ProfileHoverCard from "$lib/components/UserProfile/ProfileHoverCard.svelte";
   import type { Profile } from "$lib/models/Profile";
   import { profileService } from "$lib/services/ProfileService";
-    import { postService } from "$lib/services/PostService";
+  import { postService } from "$lib/services/PostService";
+  import { PostType, type Post } from "$lib/models/Post";
 
-  export let event: any;
-  export let replies: any[] = [];
+  export let post: Post;
+  export let replies: Post[] = [];
 
   let replyCount = 0;
 
-  let profile: Profile;
-
-  let isReply: boolean = false;
-  let replyingTo: string | null = null;
-  let isRepost: boolean = false;
-  let originalEvent: any = null;
-  let originalUser: any = null;
-  let isLoading: boolean = true;
+  let isLoading: boolean = false;
   let loadError: string | null = null;
   let repostArray: any[] = [];
   let dialogOpen = false;
@@ -53,106 +47,12 @@
     };
   }
 
-  async function parseRepostContent() {
-    if (!event?.Tags?.["Content"]) return null;
-
-    try {
-      const parsed = JSON.parse(event.Tags["Content"]);
-      if (!parsed || !parsed.From) {
-        console.error("Invalid repost content structure");
-        return null;
-      }
-      return parsed;
-    } catch (error) {
-      console.error("Failed to parse repost content:", error);
-      return null;
-    }
-  }
-
-  async function fetchConcurrentData() {
-    try {
-      const promises: Promise<any>[] = [];
-
-      // Check for reply
-      if (event.Tags["marker"] === "reply") {
-        isReply = true;
-        replyingTo = event.Tags["p"];
-      }
-
-      // Check for repost
-      if (event.Tags["Kind"] === "6") {
-        isRepost = true;
-        promises.push(
-          parseRepostContent().then(async (parsedContent) => {
-            if (parsedContent) {
-              originalEvent = parsedContent;
-              try{
-                originalUser = await profileService.get(parsedContent.From);
-              }catch(e){
-                console.log(e)
-              }
-            }
-          }),
-        );
-      }
-
-      // Count replies
-      promises.push(
-        (async () => {
-          if (!event?.Id) return;
-
-          const replyFilter = JSON.stringify([
-            {
-              kinds: ["1"],
-              tags: { marker: ["reply"] },
-            },
-            {
-              tags: { e: [event.Id] },
-            },
-          ]);
-
-          const replies = (await postService.fetchReplies(0,10000,event.Id)).values().toArray();
-          replyCount = replies.length;
-        })(),
-      );
-
-      // Count reposts if it's an original post
-      if (!isRepost) {
-        promises.push(
-          (async () => {
-            const repostFilter = JSON.stringify([
-              {
-                kinds: "6",
-                tags: { e: [event.Id.toString()] },
-              },
-            ]);
-            repostArray = await fetchEvents(repostFilter);
-          })(),
-        );
-      }
-
-      await Promise.all(promises);
-    } catch (error) {
-      // console.error("Error loading event data:", error);
-      // loadError = "Failed to load post data";
-    } finally {
-      // isLoading = false;
-    }
-  }
-
   onMount(async () => {
-    if (event) {
-      profile = event.profile
-      // Transform and add post to store
-      const post = transformEventToPost(
-        event,
-        isRepost,
-        isRepost ? originalEvent : null,
-      );
-      console.log("got profile for post")
-      console.log(profile)
+    if (post.type == PostType.Repost) {
+      isLoading = true;
+      post = await postService.get(post.id);
+      console.log("got profile for post");
       isLoading = false;
-      fetchConcurrentData();
     }
   });
 
@@ -222,83 +122,79 @@
           </div>
         </div>
       {:else if loadError}
-        <div class="p-4 text-red-500">
+        <!--<div class="p-4 text-red-500">
           {loadError}
-        </div>
+        </div>-->
       {:else}
         <div class="p-4">
-          {#if isReply}
+          {#if post.type == PostType.Reply}
             <div class="flex items-center text-muted-foreground mb-2">
               <CornerDownRight size={16} class="mr-2" />
-              <span class="text-sm">Replying to @{replyingTo}</span>
+              <!--<span class="text-sm">Replying to @{replyingTo}</span>-->
+              <span class="text-sm">Replying to @ someone fix</span>
             </div>
           {/if}
 
-          {#if isRepost && profile?.name}
+          {#if post.rePost}
             <div class="flex items-center text-muted-foreground mb-2">
               <Repeat2Icon size={16} class="mr-2" />
-              <span class="text-sm"
-                >Reposted by
-                {#if profile?.name == $currentUser?.name}
-                  You
+              <span class="text-sm">
+                {#if post.profile.address == $currentUser?.address}
+                  You Reposted
                 {:else}
-                  @{profile.name}
+                  Reposted by @{post.profile.name}
                 {/if}
               </span>
             </div>
           {/if}
 
-          <a use:link href={`/post/${event.From}/${event.Id}`}>
+          <a use:link href={`/post/${post.from}/${post.id}`}>
             <div>
               <div class="flex justify-start space-x-3">
-                {#if isRepost && originalUser}
+                {#if post.rePost}
                   <div>
-                    <ProfilePictureHoverCard profile={originalUser} />
+                    <ProfilePictureHoverCard profile={post.rePost.profile} />
                   </div>
-                {:else if profile}
+                {:else}
                   <div>
-                    <ProfilePictureHoverCard {profile} />
+                    <ProfilePictureHoverCard profile={post.profile} />
                   </div>
                 {/if}
-
                 <div class="flex-1">
                   <div class="flex space-x-1 mb-1">
-                    {#if isRepost && originalUser}
-                      <ProfileHoverCard profile={originalUser}>
-                        <div class="flex space-x-1">
-                          <p class="font-medium text-primary">
-                            {originalUser.name}
-                          </p>
-                          <span
-                            class="text-muted-foreground pl-0.5 text-ellipsis"
-                            >@{originalUser.display_name}</span
-                          >
-                        </div>
-                      </ProfileHoverCard>
-                    {:else if profile}
-                      <ProfileHoverCard {profile}>
-                        <div class="flex space-x-1">
-                          <p class="font-medium text-primary">
-                            {profile?.name}
-                          </p>
-                          <span
-                            class="text-muted-foreground pl-0.5 text-ellipsis"
-                            >@{profile?.display_name}</span
-                          >
-                        </div>
-                      </ProfileHoverCard>
+                    {#if post.rePost}
+                    <ProfileHoverCard profile={post.profile}>
+                      <div class="flex space-x-1">
+                        <p class="font-medium text-primary">
+                          {post.rePost.profile.name}
+                        </p>
+                        <span class="text-muted-foreground pl-0.5 text-ellipsis"
+                          >@{post.rePost.profile.display_name}</span
+                        >
+                      </div>
+                    </ProfileHoverCard>
+                    {:else}
+                    <ProfileHoverCard profile={post.profile}>
+                      <div class="flex space-x-1">
+                        <p class="font-medium text-primary">
+                          {post.profile.name}
+                        </p>
+                        <span class="text-muted-foreground pl-0.5 text-ellipsis"
+                          >@{post.profile.display_name}</span
+                        >
+                      </div>
+                    </ProfileHoverCard>
                     {/if}
-
                     <span class="text-muted-foreground"
-                      >· {formatTimestamp(event.Timestamp)}</span
+                      >· {formatTimestamp(post.timestamp)}</span
                     >
                   </div>
 
                   <div class="text-gray-200">
-                    {#if isRepost && originalEvent}
-                      <Nip92 event={originalEvent} />
+                    {#if post.rePost}
+                      <Nip92 post={post.rePost} />
                     {:else}
-                      <Nip92 {event} />
+                      <Nip92 {post} />
                     {/if}
                   </div>
                 </div>
@@ -308,15 +204,15 @@
 
           <div class="flex justify-between mt-3 engagement-buttons">
             <div class="flex items-center">
-              <Reply {event} {isRepost} on:newReply={handleNewReply} />
+              <Reply {post} on:newReply={handleNewReply} />
               {#if replyCount > 0}
                 <span class="ml-1 text-sm text-muted-foreground">
                   {replyCount}
                 </span>
               {/if}
             </div>
-            <Repost _event={isRepost ? originalEvent : event} />
-            <Like _event={isRepost ? originalEvent : event} />
+            <!--<Repost {post} />
+            <Like {post} />-->
             <Buy />
             <Share />
           </div>

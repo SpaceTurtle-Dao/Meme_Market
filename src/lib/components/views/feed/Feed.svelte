@@ -1,15 +1,16 @@
 <script lang="ts">
-  import Post from "$lib/components/posts/Post.svelte";
+  import PostComponent from "$lib/components/posts/Post.svelte";
+  import type { Post } from "$lib/models/Post";
   import * as Tabs from "$lib/components/ui/tabs/index.js";
   import { onMount } from "svelte";
   import { currentUser } from "$lib/stores/current-user.store";
   import { postService } from "$lib/services/PostService";
   import { profileService } from "$lib/services/ProfileService";
 
-  let events: Array<any> = [];
+  let posts: Array<Post> = [];
 
   postService.subscribe((value) => {
-    events = value.values().toArray();
+    posts = value.values().toArray();
   });
 
   async function fetchFeedEvents() {
@@ -18,7 +19,7 @@
     try {
       console.log("will get feed");
       postService.fetchPost(0, 1000, []);
-      console.log(events);
+      console.log(posts);
     } catch (error) {
       console.error("Error fetching feed events:", error);
     } finally {
@@ -97,9 +98,9 @@
   
           <Tabs.Content value="for you">
             <div>
-              {#each events as event}
+              {#each posts as post}
                 <div class="border border-border max-w-prose">
-                  <Post {event} />
+                  <PostComponent {post} />
                 </div>
               {/each}
             </div>
@@ -107,10 +108,10 @@
   
           <Tabs.Content value="following">
             <div>
-              {#each events as event}
+              {#each posts as post}
                 <div class="border border-border max-w-prose">
-                  <Post
-                    {event}
+                  <PostComponent
+                    {post}
                   />
                 </div>
               {/each}

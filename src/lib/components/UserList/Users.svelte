@@ -67,7 +67,7 @@
 </script>
 
 {#if profiles.length > 0}
-  <div class="w-full h-full">
+  <div class="w-full h-full mb-10">
     <Card.Root
       data-x-chunk-name="UserList"
       data-x-chunk-description="A card showing a list of users."
