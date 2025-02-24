@@ -17,6 +17,8 @@
   import MobileBottomNavBar from "$lib/components/views/main/MobileBottomNavBar.svelte";
   import { postService } from "$lib/services/PostService";
   import { profileService } from "$lib/services/ProfileService";
+  import PublicProfile from "$lib/components/views/profile/PublicProfile.svelte";
+  import Search from "$lib/components/search/Search.svelte";
 
   let isLoading = false;
   //let isFollowListAlreadyFetched = false;
@@ -25,9 +27,11 @@
   const routes = {
     "/": Feed,
     "/feed": Feed,
+    "/search": Search,
     "/profile": Profile,
     "/messages": MessagesPage,
     "/profile/:address": Profile,
+    "/public/profile/:address": PublicProfile,
     "/post/:id/:user": IndividualPost,
     "/signup": SignUp,
     "/test": MobileTopView,

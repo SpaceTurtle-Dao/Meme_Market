@@ -1,4 +1,3 @@
-
 -- Name: Ore Seller
 
 local json = require("json")

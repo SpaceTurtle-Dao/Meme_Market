@@ -1,4 +1,3 @@
-// users-profile.store.ts
 import { fetchEvents, fetchFollowList, fetchProfile } from "$lib/ao/relay";
 import type { Profile } from "$lib/models/Profile";
 import { get, writable, type Readable } from "svelte/store";
